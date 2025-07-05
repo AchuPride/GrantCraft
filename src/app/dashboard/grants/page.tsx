@@ -1,78 +1,99 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { mockGrants, Grant } from '@/lib/grants-data';
-import { DollarSign, Calendar, Search } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { DollarSign, Calendar, Loader2, Wand2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { matchGrants } from '@/ai/flows/grant-matcher';
+import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 
-const allCategories = Array.from(new Set(mockGrants.flatMap(g => g.categories))).sort();
+type MatchedGrant = Grant & {
+  matchScore?: number;
+  justification?: string;
+};
 
 export default function GrantsPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  
-  const filteredGrants = useMemo(() => {
-    return mockGrants.filter(grant => {
-      const searchMatch = grant.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          grant.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          grant.funder.toLowerCase().includes(searchTerm.toLowerCase());
-      const categoryMatch = selectedCategory === 'all' || grant.categories.includes(selectedCategory);
-      
-      return searchMatch && categoryMatch;
-    });
-  }, [searchTerm, selectedCategory]);
+  const [proposalAbstract, setProposalAbstract] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [grants, setGrants] = useState<MatchedGrant[]>(mockGrants);
+  const { toast } = useToast();
+
+  const handleMatchGrants = async () => {
+    if (!proposalAbstract.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Empty Abstract',
+        description: 'Please provide a proposal abstract to find matches.',
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const result = await matchGrants({ proposalAbstract });
+      if (result.matchedGrants.length === 0) {
+        toast({
+          title: 'No Matches Found',
+          description: 'The AI could not find any strong matches. Try refining your abstract.',
+        });
+      }
+      setGrants(result.matchedGrants.length > 0 ? result.matchedGrants : mockGrants);
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to find grant matches. Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-3xl font-bold font-headline tracking-tight">Find Grants</h1>
+      <h1 className="text-3xl font-bold font-headline tracking-tight">AI Grant Matcher</h1>
       
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline">Grant Search</CardTitle>
-          <CardDescription>Search our database for funding opportunities.</CardDescription>
+          <CardTitle className="font-headline">Find Matching Grants</CardTitle>
+          <CardDescription>Paste your proposal abstract below and let our AI find the best funding opportunities for you.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by keyword, funder, etc."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="pl-10"
+        <CardContent className="space-y-4">
+           <div>
+              <Label htmlFor="proposal-abstract" className="sr-only">Proposal Abstract</Label>
+              <Textarea
+                id="proposal-abstract"
+                value={proposalAbstract}
+                onChange={e => setProposalAbstract(e.target.value)}
+                placeholder="Enter your proposal abstract here..."
+                className="min-h-[150px] text-base"
               />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {allCategories.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardContent>
+        <CardFooter>
+            <Button onClick={handleMatchGrants} disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="mr-2 h-4 w-4" />
+              )}
+              Find Matches
+            </Button>
+        </CardFooter>
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredGrants.length > 0 ? filteredGrants.map(grant => (
+        {grants.length > 0 ? grants.map(grant => (
           <GrantCard key={grant.id} grant={grant} />
         )) : (
           <div className="col-span-full text-center py-12">
-            <p className="text-muted-foreground">No grants found matching your criteria.</p>
+            <p className="text-muted-foreground">No grants found in the database.</p>
           </div>
         )}
       </div>
@@ -80,7 +101,7 @@ export default function GrantsPage() {
   );
 }
 
-function GrantCard({ grant }: { grant: Grant }) {
+function GrantCard({ grant }: { grant: MatchedGrant }) {
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
@@ -94,6 +115,21 @@ function GrantCard({ grant }: { grant: Grant }) {
             <Badge key={cat} variant="secondary">{cat}</Badge>
           ))}
         </div>
+        {grant.matchScore && grant.justification && (
+          <Card className="mt-4 bg-accent/10 border-accent/30">
+            <CardHeader className="p-3">
+                <CardTitle className="text-sm text-accent font-semibold flex items-center justify-between">
+                  <span>Match Score: {Math.round(grant.matchScore * 100)}%</span>
+                </CardTitle>
+                 <Progress value={grant.matchScore * 100} className="w-full h-1.5 mt-1 bg-accent/20 [&>div]:bg-accent" />
+            </CardHeader>
+            <CardContent className="p-3 pt-0">
+              <p className="text-xs text-muted-foreground">
+                <span className="font-semibold text-accent/90">Justification:</span> {grant.justification}
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4 pt-4 border-t">
         <div className="flex items-center text-sm font-semibold">

@@ -3,6 +3,7 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { RecentProposalsTable } from '@/components/dashboard/recent-proposals-table';
 import { FilePlus2, ListTodo, Percent, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import { ProposalStatusChart } from '@/components/dashboard/proposal-status-chart';
 
 export default function DashboardPage() {
   return (
@@ -26,9 +27,14 @@ export default function DashboardPage() {
         <StatCard title="New Grants Matched" value="8" icon={FilePlus2} description="In the last 7 days" />
       </div>
 
-      <div>
-        <h2 className="text-2xl font-bold font-headline mb-4">Recent Proposals</h2>
-        <RecentProposalsTable />
+      <div className="grid gap-6 lg:grid-cols-5">
+        <div className="lg:col-span-3">
+          <h2 className="text-2xl font-bold font-headline mb-4">Recent Proposals</h2>
+          <RecentProposalsTable />
+        </div>
+        <div className="lg:col-span-2">
+           <ProposalStatusChart />
+        </div>
       </div>
     </div>
   );

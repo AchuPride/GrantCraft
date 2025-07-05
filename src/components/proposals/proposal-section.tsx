@@ -13,14 +13,27 @@ interface ProposalSectionProps {
   title: string;
   content: string;
   sectionType: SectionType;
+  onContentChange: (newContent: string) => void;
 }
 
-export function ProposalSection({ title, content: initialContent, sectionType }: ProposalSectionProps) {
+export function ProposalSection({ title, content: initialContent, sectionType, onContentChange }: ProposalSectionProps) {
   const [content, setContent] = useState(initialContent);
 
   useEffect(() => {
     setContent(initialContent);
   }, [initialContent]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value;
+    setContent(newText);
+    onContentChange(newText);
+  };
+  
+  const handleContentGenerated = (newContent: string) => {
+      const updatedContent = content + (content ? '\n\n' : '') + newContent;
+      setContent(updatedContent);
+      onContentChange(updatedContent);
+  }
 
   return (
     <Card className="h-full flex flex-col min-h-[500px]">
@@ -31,7 +44,7 @@ export function ProposalSection({ title, content: initialContent, sectionType }:
       <CardContent className="flex-grow">
         <Textarea
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleTextChange}
           className="h-full w-full text-base resize-none"
           placeholder={`Enter your ${title.toLowerCase()}...`}
         />
@@ -41,7 +54,7 @@ export function ProposalSection({ title, content: initialContent, sectionType }:
         <AIImprovementSuggester proposalSection={content} />
         <AIContentGenerator
           sectionType={sectionType}
-          onContentGenerated={(newContent) => setContent(content + '\n\n' + newContent)}
+          onContentGenerated={handleContentGenerated}
         />
       </CardFooter>
     </Card>
