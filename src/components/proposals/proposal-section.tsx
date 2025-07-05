@@ -36,7 +36,7 @@ export function ProposalSection({ title, content: initialContent, sectionType }:
         />
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
-        <AIImprovementSuggester proposalSection={content} onSuggestedContent={setContent}/>
+        <AIImprovementSuggester proposalSection={content} />
         <AIContentGenerator
           sectionType={sectionType}
           onContentGenerated={(newContent) => setContent(content + '\n\n' + newContent)}

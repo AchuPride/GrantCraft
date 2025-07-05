@@ -30,17 +30,15 @@ export function AIContentGenerator({ sectionType, onContentGenerated }: AIConten
   const [keywords, setKeywords] = useState('');
   const [summary, setSummary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleGenerate = async () => {
     if (!keywords || !summary) {
-      toast({
-        variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Please provide both keywords and a project summary.',
-      });
+      setError('Please provide both keywords and a project summary.');
       return;
     }
+    setError(null);
     setIsLoading(true);
     try {
       const result = await aiAssistedContentGeneration({
@@ -49,11 +47,9 @@ export function AIContentGenerator({ sectionType, onContentGenerated }: AIConten
         projectSummary: summary,
       });
       onContentGenerated(result.generatedContent);
-      toast({
-        title: 'Content Generated',
-        description: 'AI-assisted content has been added to your editor.',
-      });
       setIsOpen(false);
+      setKeywords('');
+      setSummary('');
     } catch (error) {
       console.error(error);
       toast({
@@ -66,8 +62,15 @@ export function AIContentGenerator({ sectionType, onContentGenerated }: AIConten
     }
   };
 
+  const onOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setError(null);
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Sparkles className="mr-2 h-4 w-4" />
@@ -89,7 +92,10 @@ export function AIContentGenerator({ sectionType, onContentGenerated }: AIConten
             <Input
               id="keywords"
               value={keywords}
-              onChange={e => setKeywords(e.target.value)}
+              onChange={e => {
+                setKeywords(e.target.value);
+                if (error) setError(null);
+              }}
               className="col-span-3"
               placeholder="e.g., STEM, education, youth"
             />
@@ -101,11 +107,19 @@ export function AIContentGenerator({ sectionType, onContentGenerated }: AIConten
             <Textarea
               id="summary"
               value={summary}
-              onChange={e => setSummary(e.target.value)}
+              onChange={e => {
+                setSummary(e.target.value);
+                if (error) setError(null);
+              }}
               className="col-span-3"
               placeholder="Briefly describe your project's goals and activities."
             />
           </div>
+          {error && (
+            <div className="col-span-4 text-center text-sm font-medium text-destructive">
+              {error}
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button type="button" onClick={handleGenerate} disabled={isLoading}>

@@ -23,6 +23,7 @@ export function AiProposalAnalyzer({ proposalText }: AiProposalAnalyzerProps) {
   const [funderPriorities, setFunderPriorities] = useState('');
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [funderPrioritiesError, setFunderPrioritiesError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleAnalyze = async () => {
@@ -35,13 +36,10 @@ export function AiProposalAnalyzer({ proposalText }: AiProposalAnalyzerProps) {
       return;
     }
      if (!funderPriorities) {
-      toast({
-        variant: 'destructive',
-        title: 'Missing Funder Priorities',
-        description: 'Please describe the funder priorities for an accurate analysis.',
-      });
+      setFunderPrioritiesError('Please describe the funder priorities for an accurate analysis.');
       return;
     }
+    setFunderPrioritiesError(null);
     setIsLoading(true);
     setResult(null);
     try {
@@ -80,10 +78,22 @@ export function AiProposalAnalyzer({ proposalText }: AiProposalAnalyzerProps) {
               <Textarea
                 id="funder-priorities"
                 value={funderPriorities}
-                onChange={e => setFunderPriorities(e.target.value)}
+                onChange={e => {
+                  setFunderPriorities(e.target.value)
+                  if (funderPrioritiesError) {
+                    setFunderPrioritiesError(null);
+                  }
+                }}
                 placeholder="e.g., Focus on youth empowerment, sustainable projects, measurable impact..."
                 className="min-h-[120px]"
+                aria-invalid={!!funderPrioritiesError}
+                aria-describedby="funder-priorities-error"
               />
+               {funderPrioritiesError && (
+                <p id="funder-priorities-error" className="mt-2 text-sm font-medium text-destructive">
+                  {funderPrioritiesError}
+                </p>
+              )}
             </div>
             <Button onClick={handleAnalyze} disabled={isLoading} className="w-full">
               {isLoading ? (

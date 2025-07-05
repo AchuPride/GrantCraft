@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,16 +18,15 @@ import { suggestImprovements } from '@/ai/flows/template-best-practices-integrat
 
 interface AIImprovementSuggesterProps {
   proposalSection: string;
-  onSuggestedContent: (content: string) => void;
 }
 
-export function AIImprovementSuggester({ proposalSection, onSuggestedContent }: AIImprovementSuggesterProps) {
+export function AIImprovementSuggester({ proposalSection }: AIImprovementSuggesterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [suggestions, setSuggestions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSuggest = async () => {
+  const handleOpen = () => {
     if (!proposalSection) {
       toast({
         variant: 'destructive',
@@ -36,32 +35,43 @@ export function AIImprovementSuggester({ proposalSection, onSuggestedContent }: 
       });
       return;
     }
-    setIsLoading(true);
-    setSuggestions('');
-    try {
-      // In a real app, you would fetch past proposals from a database.
-      const pastSuccessfulProposals = 'Example of a successful proposal section...';
-      const result = await suggestImprovements({
-        proposalSection,
-        pastSuccessfulProposals,
-      });
-      setSuggestions(result.suggestions);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to get suggestions. Please try again.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    setIsOpen(true);
   };
+  
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const getSuggestions = async () => {
+      setIsLoading(true);
+      setSuggestions('');
+      try {
+        // In a real app, you would fetch past proposals from a database.
+        const pastSuccessfulProposals = 'Example of a successful proposal section...';
+        const result = await suggestImprovements({
+          proposalSection,
+          pastSuccessfulProposals,
+        });
+        setSuggestions(result.suggestions);
+      } catch (error) {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to get suggestions. Please try again.',
+        });
+        setIsOpen(false);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    getSuggestions();
+  }, [isOpen, proposalSection, toast]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={handleSuggest}>
+        <Button variant="outline" onClick={handleOpen}>
           <Lightbulb className="mr-2 h-4 w-4" />
           Get Suggestions
         </Button>
