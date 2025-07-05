@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Textarea } from '@/components/ui/textarea';
 import { AIContentGenerator } from './ai-content-generator';
 import { AIImprovementSuggester } from './ai-improvement-suggester';
+import { PlagiarismChecker } from './plagiarism-checker';
 
 type SectionType = 'problemStatement' | 'objectives' | 'budgetJustification' | 'executiveSummary' | 'abstract' | 'methodology';
 
@@ -35,7 +36,8 @@ export function ProposalSection({ title, content: initialContent, sectionType }:
           placeholder={`Enter your ${title.toLowerCase()}...`}
         />
       </CardContent>
-      <CardFooter className="flex justify-end gap-2">
+      <CardFooter className="flex flex-wrap justify-end gap-2">
+        <PlagiarismChecker textToCheck={content} />
         <AIImprovementSuggester proposalSection={content} />
         <AIContentGenerator
           sectionType={sectionType}
