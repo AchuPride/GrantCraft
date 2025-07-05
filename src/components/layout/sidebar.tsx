@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NAV_LINKS } from '@/lib/constants';
-import { cn } from '@/lib/utils';
 import {
   Sidebar,
   SidebarHeader,
@@ -14,7 +13,6 @@ import {
   SidebarFooter
 } from '@/components/ui/sidebar';
 import { Rocket, LifeBuoy } from 'lucide-react';
-import { Button } from '../ui/button';
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -35,7 +33,7 @@ export function AppSidebar() {
         <SidebarMenu className="px-2">
           {NAV_LINKS.map(link => (
             <SidebarMenuItem key={link.href}>
-              <Link href={link.href} passHref legacyBehavior>
+              <Link href={link.href}>
                 <SidebarMenuButton
                   isActive={pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href))}
                   tooltip={{ children: link.label, side: 'right' }}
