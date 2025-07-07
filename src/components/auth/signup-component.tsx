@@ -28,6 +28,7 @@ export function SignupComponent() {
       email,
       password,
       options: {
+        emailRedirectTo: `${location.origin}/auth/callback`,
         data: {
           full_name: fullName,
         },
@@ -48,8 +49,9 @@ export function SignupComponent() {
         title: 'Success!',
         description: 'Please check your email to confirm your account.'
     });
-
-    router.refresh();
+    
+    setIsLoading(false);
+    // No need to refresh router, user needs to confirm email first.
   };
 
   const handleGoogleLogin = async () => {
