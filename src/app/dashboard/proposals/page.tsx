@@ -2,9 +2,28 @@ import { Button } from '@/components/ui/button';
 import { ProposalsTable } from '@/components/proposals/proposals-table';
 import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
-import { mockProposals } from '@/lib/data';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function ProposalsPage() {
+export default async function ProposalsPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect('/');
+  }
+
+  const { data: proposals, error } = await supabase
+    .from('proposals')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching proposals:', error);
+    // You might want to show an error message to the user
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -18,7 +37,7 @@ export default function ProposalsPage() {
             </Link>
         </div>
       </div>
-      <ProposalsTable proposals={mockProposals} />
+      <ProposalsTable proposals={proposals || []} />
     </div>
   );
 }

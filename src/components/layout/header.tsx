@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Link from 'next/link';
+import { logout } from '@/actions/auth';
 
 export function AppHeader() {
   return (
@@ -38,9 +38,11 @@ export function AppHeader() {
           <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <Link href="/" passHref>
-            <DropdownMenuItem>Log out</DropdownMenuItem>
-          </Link>
+          <form action={logout}>
+            <button type="submit" className="w-full">
+                <DropdownMenuItem>Log out</DropdownMenuItem>
+            </button>
+          </form>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

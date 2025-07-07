@@ -4,33 +4,67 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProposalSection } from './proposal-section';
 import { AiProposalAnalyzer } from './ai-proposal-analyzer';
-import type { Proposal } from '@/lib/data';
+import type { Proposal, ProposalContent } from '@/lib/data';
 import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Save, Loader2 } from 'lucide-react';
+import { saveProposal } from '@/actions/proposals';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProposalEditorProps {
-    proposal: Proposal;
+    proposal: Proposal | (Omit<Proposal, 'content'> & { content: ProposalContent });
 }
 
 export function ProposalEditor({ proposal }: ProposalEditorProps) {
-    const [proposalName, setProposalName] = useState(proposal.name);
-    const [content, setContent] = useState(proposal.content);
+    const { toast } = useToast();
+    const [isSaving, setIsSaving] = useState(false);
+    const [name, setName] = useState(proposal.name);
+    const [content, setContent] = useState(proposal.content as ProposalContent);
 
-    const handleContentChange = (section: keyof Proposal['content'], newText: string) => {
+    const handleContentChange = (section: keyof ProposalContent, newText: string) => {
         setContent(prev => ({...prev, [section]: newText}));
+    }
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        const result = await saveProposal({
+            ...proposal,
+            name,
+            content,
+        });
+
+        if (result.error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error Saving',
+                description: result.error.message
+            });
+        } else {
+            toast({
+                title: 'Saved!',
+                description: 'Your proposal has been saved successfully.'
+            })
+        }
+        setIsSaving(false);
     }
     
     const fullProposalText = Object.values(content).join('\n\n');
 
     return (
         <div className="flex flex-col gap-4">
-             {proposal.id === 'new' && (
+            <div className="flex items-center justify-between gap-4">
                 <Input 
                     placeholder="Enter Proposal Title" 
-                    value={proposalName}
-                    onChange={e => setProposalName(e.target.value)}
+                    value={name}
+                    onChange={e => setName(e.target.value)}
                     className="text-2xl h-12 font-headline"
                 />
-            )}
+                <Button onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                    {isSaving ? 'Saving...' : 'Save'}
+                </Button>
+            </div>
+            
             <Tabs defaultValue="overview" className="flex-grow flex flex-col">
                 <TabsList className="grid w-full grid-cols-4 sm:grid-cols-5 md:grid-cols-7">
                     <TabsTrigger value="overview">Overview</TabsTrigger>

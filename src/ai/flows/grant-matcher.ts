@@ -9,7 +9,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { Grant, mockGrants } from '@/lib/grants-data';
+import { Grant } from '@/lib/grants-data';
+import { createClient } from '@/lib/supabase/server';
 
 const GrantSchema = z.object({
   id: z.string(),
@@ -40,10 +41,17 @@ export type GrantMatcherOutput = z.infer<typeof GrantMatcherOutputSchema>;
 
 
 export async function matchGrants(input: { proposalAbstract: string }): Promise<GrantMatcherOutput> {
-  // In a real app, grants would be fetched from a DB. Here we use mock data.
+  const supabase = createClient();
+  const { data: availableGrants, error } = await supabase.from('grants').select('*');
+
+  if (error) {
+    console.error("Error fetching grants for matching:", error);
+    throw new Error("Could not fetch grants from the database.");
+  }
+
   return grantMatcherFlow({
     proposalAbstract: input.proposalAbstract,
-    availableGrants: mockGrants,
+    availableGrants: availableGrants || [],
   });
 }
 

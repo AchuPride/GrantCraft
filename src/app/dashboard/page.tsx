@@ -4,8 +4,36 @@ import { RecentProposalsTable } from '@/components/dashboard/recent-proposals-ta
 import { FilePlus2, ListTodo, Percent, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { ProposalStatusChart } from '@/components/dashboard/proposal-status-chart';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    redirect('/');
+  }
+
+  const { count: activeProposalsCount } = await supabase
+    .from('proposals')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .in('status', ['Draft', 'Submitted']);
+
+  const { count: awardedCount } = await supabase
+    .from('proposals')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('status', 'Awarded');
+    
+  const { count: totalSubmittedCount } = await supabase
+    .from('proposals')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .in('status', ['Awarded', 'Rejected', 'Submitted']);
+  
+  const successRate = totalSubmittedCount && awardedCount ? Math.round((awardedCount / totalSubmittedCount) * 100) : 0;
+  
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -21,10 +49,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Active Proposals" value="12" icon={TrendingUp} description="+2 from last month" />
-        <StatCard title="Tasks Due" value="5" icon={ListTodo} description="2 overdue" />
-        <StatCard title="Avg. Success Rate" value="78%" icon={Percent} description="Based on 16 submissions" />
-        <StatCard title="New Grants Matched" value="8" icon={FilePlus2} description="In the last 7 days" />
+        <StatCard title="Active Proposals" value={activeProposalsCount?.toString() || '0'} icon={TrendingUp} />
+        <StatCard title="Tasks Due" value="0" icon={ListTodo} description="Coming soon" />
+        <StatCard title="Avg. Success Rate" value={`${successRate}%`} icon={Percent} description={`Based on ${totalSubmittedCount} submissions`} />
+        <StatCard title="New Grants Matched" value="0" icon={FilePlus2} description="Run AI Grant Matcher" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">

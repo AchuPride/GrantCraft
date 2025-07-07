@@ -11,9 +11,24 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
-import { mockProposals } from '@/lib/data';
+import { createClient } from '@/lib/supabase/server';
+import { formatDistanceToNow } from 'date-fns';
 
-export function RecentProposalsTable() {
+export async function RecentProposalsTable() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const { data: proposals } = await supabase
+    .from('proposals')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('last_modified', { ascending: false })
+    .limit(5);
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -27,7 +42,7 @@ export function RecentProposalsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockProposals.slice(0, 5).map(proposal => (
+            {(proposals || []).map(proposal => (
               <TableRow key={proposal.id}>
                 <TableCell>
                   <div className="font-medium">{proposal.name}</div>
@@ -39,7 +54,9 @@ export function RecentProposalsTable() {
                     {proposal.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">{proposal.lastModified}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                    {formatDistanceToNow(new Date(proposal.last_modified), { addSuffix: true })}
+                </TableCell>
                 <TableCell className="text-right">
                    <Button asChild variant="ghost" size="icon">
                     <Link href={`/dashboard/proposals/${proposal.id}`}>

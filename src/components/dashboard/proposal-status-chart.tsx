@@ -3,8 +3,10 @@
 import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartTooltipContent, ChartContainer, ChartConfig } from '@/components/ui/chart';
-import { mockProposals } from '@/lib/data';
-import { useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { Proposal } from '@/lib/data';
+import { Skeleton } from '../ui/skeleton';
 
 const chartConfig = {
   count: {
@@ -14,14 +16,53 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ProposalStatusChart() {
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProposals = async () => {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('proposals')
+            .select('status')
+            .eq('user_id', user.id);
+        
+        if (data) {
+            setProposals(data as Proposal[]);
+        }
+        setLoading(false);
+    };
+    fetchProposals();
+  }, []);
+
   const chartData = useMemo(() => {
-    const statusCounts = mockProposals.reduce((acc, proposal) => {
+    const statusCounts = proposals.reduce((acc, proposal) => {
       acc[proposal.status] = (acc[proposal.status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
-  }, []);
+  }, [proposals]);
+
+  if (loading) {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+            </CardHeader>
+            <CardContent>
+                <Skeleton className="min-h-[200px] w-full h-72" />
+            </CardContent>
+        </Card>
+    )
+  }
 
   return (
     <Card>

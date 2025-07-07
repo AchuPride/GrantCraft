@@ -1,36 +1,54 @@
 import { ProposalEditor } from '@/components/proposals/proposal-editor';
-import { mockProposals } from '@/lib/data';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Download, Share2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { ProposalContent } from '@/lib/data';
 
 export default async function ProposalPage({ params }: { params: { id: string } }) {
-  const proposal = mockProposals.find(p => p.id === params.id);
+  const supabase = createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+      return redirect('/');
+  }
 
-  if (!proposal) {
-    if (params.id === 'new') {
-      // Allow creating a new proposal
-    } else {
+  const isNew = params.id === 'new';
+  let proposal = null;
+
+  if (!isNew) {
+    const { data } = await supabase
+      .from('proposals')
+      .select('*')
+      .eq('id', params.id)
+      .eq('user_id', user.id)
+      .single();
+    
+    if (!data) {
         notFound();
     }
+    proposal = data;
   }
 
   const newProposalTemplate = {
     id: 'new',
-    name: 'New Proposal',
+    name: '',
     status: 'Draft' as const,
-    lastModified: new Date().toLocaleDateString(),
+    last_modified: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    user_id: user.id,
     content: {
       overview: '',
       problemStatement: '',
       objectives: '',
       methodology: '',
       budget: '',
-    },
+      abstract: '',
+    } as ProposalContent,
   };
 
-  const currentProposal = params.id === 'new' ? newProposalTemplate : proposal!;
+  const currentProposal = isNew ? newProposalTemplate : proposal!;
 
 
   return (
@@ -44,7 +62,7 @@ export default async function ProposalPage({ params }: { params: { id: string } 
                 </Link>
             </Button>
             <div>
-                <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">{currentProposal.name}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">{isNew ? 'New Proposal' : currentProposal.name}</h1>
                 <p className="text-muted-foreground">Status: {currentProposal.status}</p>
             </div>
         </div>

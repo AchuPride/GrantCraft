@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Proposal } from '@/lib/data';
+import { formatDistanceToNow } from 'date-fns';
 
 interface ProposalsTableProps {
   proposals: Proposal[];
@@ -56,7 +57,9 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
                     {proposal.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">{proposal.lastModified}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                    {formatDistanceToNow(new Date(proposal.last_modified), { addSuffix: true })}
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
