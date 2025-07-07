@@ -41,6 +41,23 @@ export function LoginComponent() {
     router.refresh();
   };
 
+  const handleGoogleLogin = async () => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
+    });
+     if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Could not authenticate with Google. Please try again.',
+      });
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 font-body">
       <Card className="mx-auto max-w-sm w-full shadow-xl">
@@ -70,7 +87,7 @@ export function LoginComponent() {
               {isLoading && <Loader2 className="animate-spin" />}
               Login
             </Button>
-            <Button variant="outline" className="w-full" type="button" disabled>
+            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleLogin}>
               Login with Google
             </Button>
           </form>

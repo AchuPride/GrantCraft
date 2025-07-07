@@ -52,6 +52,23 @@ export function SignupComponent() {
     router.refresh();
   };
 
+  const handleGoogleLogin = async () => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
+    });
+     if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign Up Failed',
+        description: 'Could not authenticate with Google. Please try again.',
+      });
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 font-body">
       <Card className="mx-auto max-w-sm w-full shadow-xl">
@@ -79,6 +96,9 @@ export function SignupComponent() {
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
               {isLoading && <Loader2 className="animate-spin" />}
               Create Account
+            </Button>
+            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleLogin}>
+              Sign up with Google
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">

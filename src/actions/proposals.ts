@@ -6,9 +6,7 @@ import { redirect } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import type { Proposal } from '@/lib/data';
 
-type ProposalUpdatable = Omit<Proposal, 'created_at' | 'user_id'>;
-
-export async function saveProposal(proposalData: ProposalUpdatable) {
+export async function saveProposal(proposalData: Proposal) {
   const supabase = createClient();
 
   const {
@@ -21,12 +19,20 @@ export async function saveProposal(proposalData: ProposalUpdatable) {
   
   const isNew = proposalData.id === 'new';
 
-  const dataToUpsert = {
-    ...proposalData,
+  // Omit fields that should not be sent on update or are handled by the DB.
+  const { created_at, last_modified, ...restOfProposalData } = proposalData;
+
+  const dataToUpsert: any = {
+    ...restOfProposalData,
     id: isNew ? uuidv4() : proposalData.id,
     user_id: user.id,
-    last_modified: new Date().toISOString(),
   };
+
+  // The database trigger handles last_modified on UPDATE.
+  // We only set it here manually on INSERT, since the trigger only fires on update.
+  if (isNew) {
+    dataToUpsert.last_modified = new Date().toISOString();
+  }
 
   const { data, error } = await supabase.from('proposals').upsert(dataToUpsert).select().single();
 

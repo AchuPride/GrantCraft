@@ -67,6 +67,30 @@ export interface Database {
             categories?: string[]
         }
       }
+      comments: {
+        Row: {
+          id: string
+          created_at: string
+          user_id: string
+          proposal_id: string
+          content: string
+          user_full_name: string | null
+          user_avatar_url: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          user_id: string
+          proposal_id: string
+          content: string
+          user_full_name?: string | null
+          user_avatar_url?: string | null
+        }
+        Update: {
+          id?: string
+          content?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

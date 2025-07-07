@@ -10,6 +10,7 @@ import { Button } from '../ui/button';
 import { Save, Loader2 } from 'lucide-react';
 import { saveProposal } from '@/actions/proposals';
 import { useToast } from '@/hooks/use-toast';
+import { ProposalComments } from './proposal-comments';
 
 interface ProposalEditorProps {
     proposal: Proposal | (Omit<Proposal, 'content'> & { content: ProposalContent });
@@ -49,6 +50,7 @@ export function ProposalEditor({ proposal }: ProposalEditorProps) {
     }
     
     const fullProposalText = Object.values(content).join('\n\n');
+    const isNewProposal = proposal.id === 'new';
 
     return (
         <div className="flex flex-col gap-4">
@@ -59,21 +61,22 @@ export function ProposalEditor({ proposal }: ProposalEditorProps) {
                     onChange={e => setName(e.target.value)}
                     className="text-2xl h-12 font-headline"
                 />
-                <Button onClick={handleSave} disabled={isSaving}>
+                <Button onClick={handleSave} disabled={isSaving || !name.trim()}>
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     {isSaving ? 'Saving...' : 'Save'}
                 </Button>
             </div>
             
             <Tabs defaultValue="overview" className="flex-grow flex flex-col">
-                <TabsList className="grid w-full grid-cols-4 sm:grid-cols-5 md:grid-cols-7">
+                <TabsList className="grid w-full grid-cols-4 sm:grid-cols-5 md:grid-cols-8">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="abstract">Abstract</TabsTrigger>
                     <TabsTrigger value="problem">Problem</TabsTrigger>
                     <TabsTrigger value="objectives">Objectives</TabsTrigger>
                     <TabsTrigger value="methodology">Methodology</TabsTrigger>
                     <TabsTrigger value="budget">Budget</TabsTrigger>
-                    <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
+                    <TabsTrigger value="comments" disabled={isNewProposal}>Comments</TabsTrigger>
+                    <TabsTrigger value="analysis" disabled={isNewProposal}>AI Analysis</TabsTrigger>
                 </TabsList>
                 <div className="flex-grow mt-4">
                     <TabsContent value="overview" className="h-full">
@@ -94,8 +97,11 @@ export function ProposalEditor({ proposal }: ProposalEditorProps) {
                     <TabsContent value="budget" className="h-full">
                         <ProposalSection title="Budget Justification" content={content.budget} sectionType="budgetJustification" onContentChange={(newText) => handleContentChange('budget', newText)} />
                     </TabsContent>
+                    <TabsContent value="comments" className="h-full">
+                        {isNewProposal ? null : <ProposalComments proposalId={proposal.id} />}
+                    </TabsContent>
                     <TabsContent value="analysis" className="h-full">
-                        <AiProposalAnalyzer proposalText={fullProposalText} />
+                        {isNewProposal ? null : <AiProposalAnalyzer proposalText={fullProposalText} />}
                     </TabsContent>
                 </div>
             </Tabs>
