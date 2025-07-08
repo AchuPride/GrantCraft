@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -28,7 +29,7 @@ export function SignupComponent() {
       email,
       password,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: `http://localhost:9002/auth/callback`,
         data: {
           full_name: fullName,
         },
@@ -59,7 +60,7 @@ export function SignupComponent() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `http://localhost:9002/auth/callback`,
       },
     });
      if (error) {
