@@ -18,25 +18,34 @@ export default async function DashboardPage() {
     redirect('/');
   }
 
-  const { count: activeProposalsCount } = await supabase
-    .from('proposals')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .in('status', ['Draft', 'Submitted']);
+  const [activeResult, awardedResult, totalResult] = await Promise.all([
+    supabase
+      .from('proposals')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .in('status', ['Draft', 'Submitted']),
+    supabase
+      .from('proposals')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('status', 'Awarded'),
+    supabase
+      .from('proposals')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .in('status', ['Awarded', 'Rejected', 'Submitted'])
+  ]);
 
-  const { count: awardedCount } = await supabase
-    .from('proposals')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('status', 'Awarded');
-    
-  const { count: totalSubmittedCount } = await supabase
-    .from('proposals')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .in('status', ['Awarded', 'Rejected', 'Submitted']);
-  
-  const successRate = totalSubmittedCount && awardedCount ? Math.round((awardedCount / totalSubmittedCount) * 100) : 0;
+  if (activeResult.error || awardedResult.error || totalResult.error) {
+      console.error('Error fetching dashboard stats:', activeResult.error || awardedResult.error || totalResult.error);
+      // To prevent a crash, we'll proceed with 0 counts, but log the error for debugging.
+  }
+
+  const activeProposalsCount = activeResult.count ?? 0;
+  const awardedCount = awardedResult.count ?? 0;
+  const totalSubmittedCount = totalResult.count ?? 0;
+
+  const successRate = totalSubmittedCount > 0 ? Math.round((awardedCount / totalSubmittedCount) * 100) : 0;
   
   return (
     <div className="flex flex-col gap-8">
@@ -53,9 +62,9 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Active Proposals" value={activeProposalsCount?.toString() || '0'} icon={TrendingUp} />
+        <StatCard title="Active Proposals" value={activeProposalsCount.toString()} icon={TrendingUp} />
         <StatCard title="Tasks Due" value="0" icon={ListTodo} description="Coming soon" />
-        <StatCard title="Avg. Success Rate" value={`${successRate}%`} icon={Percent} description={`Based on ${totalSubmittedCount} submissions`} />
+        <StatCard title="Avg. Success Rate" value={`${successRate}%`} icon={Percent} description={`Based on ${totalSubmittedCount || 0} submissions`} />
         <StatCard title="New Grants Matched" value="0" icon={FilePlus2} description="Run AI Grant Matcher" />
       </div>
 
