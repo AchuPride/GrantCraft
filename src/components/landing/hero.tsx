@@ -26,12 +26,11 @@ export function Hero() {
             </div>
           </div>
           <Image
-            src="https://placehold.co/600x400.png"
+            src="https://eurydice.eacea.ec.europa.eu/sites/default/files/styles/large/public/2023-03/Grant.jpg?itok=pQOgRxWM"
             width="600"
             height="400"
-            alt="A conceptual image representing grants and funding with wooden blocks and icons."
+            alt="An image of a hand writing on a grant application form."
             className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last animate-in fade-in slide-in-from-right-8 duration-1000"
-            data-ai-hint="grant funding"
           />
         </div>
       </div>

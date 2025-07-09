@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'eurydice.eacea.ec.europa.eu',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
