@@ -31,7 +31,7 @@ export function Hero() {
             height="400"
             alt="Hero"
             className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
-            data-ai-hint="app dashboard"
+            data-ai-hint="grant funding"
           />
         </div>
       </div>
