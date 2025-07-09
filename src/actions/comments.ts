@@ -3,11 +3,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import type { Database } from '@/lib/database.types';
+import { cookies } from 'next/headers';
 
 type CommentInsert = Database['public']['Tables']['comments']['Insert'];
 
 export async function addComment(commentData: Omit<CommentInsert, 'user_id' | 'user_full_name' | 'user_avatar_url'>) {
-  const supabase = createClient();
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
   const {
     data: { user },

@@ -11,6 +11,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { Grant } from '@/lib/grants-data';
 import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 
 const GrantSchema = z.object({
   id: z.string(),
@@ -41,7 +42,8 @@ export type GrantMatcherOutput = z.infer<typeof GrantMatcherOutputSchema>;
 
 
 export async function matchGrants(input: { proposalAbstract: string }): Promise<GrantMatcherOutput> {
-  const supabase = createClient();
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
   const { data: availableGrants, error } = await supabase.from('grants').select('*');
 
   if (error) {

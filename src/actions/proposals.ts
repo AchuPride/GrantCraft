@@ -5,9 +5,11 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import type { Proposal } from '@/lib/data';
+import { cookies } from 'next/headers';
 
 export async function saveProposal(proposalData: Proposal) {
-  const supabase = createClient();
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
   const {
     data: { user },

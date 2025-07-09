@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { ProposalStatusChart } from '@/components/dashboard/proposal-status-chart';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const supabase = createClient();
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     redirect('/');

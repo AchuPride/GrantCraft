@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { formatDistanceToNow } from 'date-fns';
+import { cookies } from 'next/headers';
 
 export async function RecentProposalsTable() {
-  const supabase = createClient();
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
