@@ -7,7 +7,7 @@ export function Hero() {
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gray-50/50">
       <div className="container px-4 md:px-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-          <div className="flex flex-col justify-center space-y-4">
+          <div className="flex flex-col justify-center space-y-4 animate-in fade-in slide-in-from-left-8 duration-1000">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold font-headline tracking-tighter sm:text-5xl xl:text-6xl/none">
                 Secure Funding Faster with AI-Powered Grant Proposals
@@ -26,12 +26,12 @@ export function Hero() {
             </div>
           </div>
           <Image
-            src="https://placehold.co/600/600.png"
+            src="https://placehold.co/600x400.png"
             width="600"
-            height="600"
-            alt="Hero"
-            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
-            data-ai-hint="grant proposal"
+            height="400"
+            alt="A conceptual image representing grants and funding with wooden blocks and icons."
+            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last animate-in fade-in slide-in-from-right-8 duration-1000"
+            data-ai-hint="grant funding"
           />
         </div>
       </div>

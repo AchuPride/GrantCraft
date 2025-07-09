@@ -36,7 +36,7 @@ export function Features() {
 
   return (
     <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50/50">
-      <div className="container px-4 md:px-6">
+      <div className="container px-4 md:px-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div className="inline-block rounded-lg bg-accent/10 px-3 py-1 text-sm text-accent font-semibold">Key Features</div>

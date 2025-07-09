@@ -3,7 +3,7 @@ import { Handshake, Landmark, Leaf, School } from 'lucide-react';
 export function SocialProof() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-16 bg-background">
-      <div className="container px-4 md:px-6">
+      <div className="container px-4 md:px-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">Trusted by Leading Non-profits & Institutions</h2>
