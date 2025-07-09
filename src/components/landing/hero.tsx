@@ -26,12 +26,12 @@ export function Hero() {
             </div>
           </div>
           <Image
-            src="https://picsum.photos/600/400"
+            src="https://placehold.co/600/600.png"
             width="600"
-            height="400"
+            height="600"
             alt="Hero"
-            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-            data-ai-hint="app dashboard"
+            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
+            data-ai-hint="grant proposal"
           />
         </div>
       </div>
