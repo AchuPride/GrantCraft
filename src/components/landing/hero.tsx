@@ -30,8 +30,8 @@ export function Hero() {
             width="600"
             height="400"
             alt="Hero"
-            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
-            data-ai-hint="grant funding"
+            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
+            data-ai-hint="app dashboard"
           />
         </div>
       </div>
