@@ -106,7 +106,7 @@ export function SignupComponent() {
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
-            <Link href="/" className="underline text-primary/80 hover:text-primary">
+            <Link href="/login" className="underline text-primary/80 hover:text-primary">
               Login
             </Link>
           </div>

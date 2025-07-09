@@ -90,7 +90,7 @@ export async function middleware(request: NextRequest) {
   }
   
   // Auth routes
-  if (session && (pathname === '/' || pathname === '/signup')) {
+  if (session && (pathname === '/' || pathname === '/signup' || pathname === '/login')) {
      const url = request.nextUrl.clone()
      url.pathname = '/dashboard'
      return NextResponse.redirect(url)
@@ -112,5 +112,6 @@ export const config = {
     '/',
     '/signup',
     '/dashboard/:path*',
+    '/login',
   ],
 }
