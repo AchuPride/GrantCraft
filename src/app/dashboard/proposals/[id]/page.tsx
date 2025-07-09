@@ -6,6 +6,8 @@ import { ChevronLeft, Download, Share2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { ProposalContent } from '@/lib/data';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProposalPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
   
