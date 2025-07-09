@@ -8,8 +8,17 @@ import { Testimonials } from '@/components/landing/testimonials';
 import { FAQ } from '@/components/landing/faq';
 import { Cta } from '@/components/landing/cta';
 import { Footer } from '@/components/landing/footer';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="flex flex-col min-h-[100dvh] bg-background font-body">
       <Header />
