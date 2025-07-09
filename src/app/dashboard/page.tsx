@@ -13,29 +13,30 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardPage() {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
-  const { data } = await supabase.auth.getUser();
+  const { data: authData } = await supabase.auth.getUser();
 
-  if (!data.user) {
+  if (!authData?.user) {
     // This page should only be accessible if the user is logged in,
     // which is enforced by the layout. This is a safeguard.
     redirect('/login');
   }
+  const user = authData.user;
 
   const [activeResult, awardedResult, totalResult] = await Promise.all([
     supabase
       .from('proposals')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', data.user.id)
+      .eq('user_id', user.id)
       .in('status', ['Draft', 'Submitted']),
     supabase
       .from('proposals')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', data.user.id)
+      .eq('user_id', user.id)
       .eq('status', 'Awarded'),
     supabase
       .from('proposals')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', data.user.id)
+      .eq('user_id', user.id)
       .in('status', ['Awarded', 'Rejected', 'Submitted'])
   ]);
 

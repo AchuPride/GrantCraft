@@ -14,7 +14,7 @@ export default async function ProposalPage({ params }: { params: { id: string } 
   const supabase = createClient(cookieStore);
   
   const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user) {
+  if (!authData?.user) {
       return redirect('/login');
   }
   const user = authData.user;

@@ -12,7 +12,7 @@ export default async function DashboardLayout({
   const supabase = createClient(cookieStore);
   const { data } = await supabase.auth.getUser();
 
-  if (!data.user) {
+  if (!data?.user) {
     redirect('/login');
   }
 

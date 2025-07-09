@@ -11,24 +11,21 @@ export async function addComment(commentData: Omit<CommentInsert, 'user_id' | 'u
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: authData } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (!authData.user) {
     return { error: { message: 'You must be logged in to comment.' } };
   }
+  const user = authData.user;
 
   const { content, proposal_id } = commentData;
-
-  const { data: userData } = await supabase.auth.getUser();
 
   const dataToInsert = {
     content,
     proposal_id,
     user_id: user.id,
-    user_full_name: userData.user?.user_metadata?.full_name ?? userData.user?.email,
-    user_avatar_url: userData.user?.user_metadata?.avatar_url,
+    user_full_name: user.user_metadata?.full_name ?? user.email,
+    user_avatar_url: user.user_metadata?.avatar_url,
   };
 
   const { data, error } = await supabase.from('comments').insert(dataToInsert).select().single();

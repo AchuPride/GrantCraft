@@ -58,7 +58,7 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                    {formatDistanceToNow(new Date(proposal.last_modified), { addSuffix: true })}
+                    {proposal.last_modified ? formatDistanceToNow(new Date(proposal.last_modified), { addSuffix: true }) : '-'}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>

@@ -22,11 +22,12 @@ export function ProposalStatusChart() {
   useEffect(() => {
     const fetchProposals = async () => {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        const { data: authData } = await supabase.auth.getUser();
+        if (!authData?.user) {
             setLoading(false);
             return;
         }
+        const user = authData.user;
 
         const { data, error } = await supabase
             .from('proposals')

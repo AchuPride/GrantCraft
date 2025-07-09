@@ -19,12 +19,12 @@ export async function RecentProposalsTable() {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data: authData } = await supabase.auth.getUser();
-  const user = authData.user;
 
-  if (!user) {
+  if (!authData?.user) {
     // This case should ideally not be hit if the component is used within DashboardLayout
     return null;
   }
+  const user = authData.user;
 
   const { data: proposals, error } = await supabase
     .from('proposals')
@@ -71,7 +71,7 @@ export async function RecentProposalsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                      {formatDistanceToNow(new Date(proposal.last_modified), { addSuffix: true })}
+                      {proposal.last_modified ? formatDistanceToNow(new Date(proposal.last_modified), { addSuffix: true }) : '-'}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="ghost" size="icon">

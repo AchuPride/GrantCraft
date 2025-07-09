@@ -11,13 +11,12 @@ export async function saveProposal(proposalData: Proposal) {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: authData } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (!authData.user) {
     return { error: { message: 'You must be logged in to save a proposal.' } };
   }
+  const user = authData.user;
   
   const isNew = proposalData.id === 'new';
 
