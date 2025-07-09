@@ -9,17 +9,13 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-interface PageProps {
-  params: { id: string };
-}
-
-export default async function ProposalPage({ params }: PageProps) {
+export default async function ProposalPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   
   const { data: authData } = await supabase.auth.getUser();
   if (!authData?.user) {
-      return redirect('/login');
+      redirect('/login');
   }
   const user = authData.user;
 
