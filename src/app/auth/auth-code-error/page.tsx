@@ -18,7 +18,7 @@ export default function AuthErrorPage() {
                 </CardHeader>
                 <CardContent>
                     <Button asChild>
-                        <Link href="/">Return to Login</Link>
+                        <Link href="/login">Return to Login</Link>
                     </Button>
                 </CardContent>
             </Card>
