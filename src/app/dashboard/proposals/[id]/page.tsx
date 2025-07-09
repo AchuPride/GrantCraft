@@ -9,7 +9,11 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProposalPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: { id: string };
+}
+
+export default async function ProposalPage({ params }: PageProps) {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   
