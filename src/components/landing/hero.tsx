@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export function Hero() {
   return (
@@ -24,7 +25,7 @@ export function Hero() {
               </Button>
             </div>
           </div>
-          <img
+          <Image
             src="https://placehold.co/600x400.png"
             width="600"
             height="400"
