@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 export default async function SignupPage() {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
 
-  if (user) {
+  if (data.user) {
     redirect('/dashboard');
   }
   

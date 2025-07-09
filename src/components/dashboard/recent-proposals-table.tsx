@@ -18,9 +18,11 @@ import { cookies } from 'next/headers';
 export async function RecentProposalsTable() {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: authData } = await supabase.auth.getUser();
+  const user = authData.user;
 
   if (!user) {
+    // This case should ideally not be hit if the component is used within DashboardLayout
     return null;
   }
 

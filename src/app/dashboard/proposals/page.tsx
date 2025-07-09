@@ -11,16 +11,16 @@ export const dynamic = 'force-dynamic';
 export default async function ProposalsPage() {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
 
-  if (!user) {
-    return redirect('/');
+  if (!data.user) {
+    return redirect('/login');
   }
 
   const { data: proposals, error } = await supabase
     .from('proposals')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', data.user.id)
     .order('created_at', { ascending: false });
 
   if (error) {

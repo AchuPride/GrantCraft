@@ -13,10 +13,11 @@ export default async function ProposalPage({ params }: { params: { id: string } 
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-      return redirect('/');
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) {
+      return redirect('/login');
   }
+  const user = authData.user;
 
   const isNew = params.id === 'new';
   let proposal = null;
