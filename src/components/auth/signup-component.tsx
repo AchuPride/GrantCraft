@@ -71,9 +71,6 @@ export function SignupComponent() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${getURL()}auth/callback`,
-      },
     });
      if (error) {
       toast({
@@ -106,7 +103,7 @@ export function SignupComponent() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.targe.value)} />
             </div>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
               {isLoading && <Loader2 className="animate-spin" />}

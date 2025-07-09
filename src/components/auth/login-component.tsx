@@ -12,18 +12,6 @@ import { createClient } from '@/lib/supabase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const getURL = () => {
-  let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production
-    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Vercel adds this
-    'http://localhost:9002/'; // dev fallback
-  // Make sure to include `https` in production
-  url = url.includes('http') ? url : `https://${url}`;
-  // Make sure to include a trailing `/`
-  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
-  return url;
-};
-
 export function LoginComponent() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -58,9 +46,6 @@ export function LoginComponent() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${getURL()}auth/callback`,
-      },
     });
      if (error) {
       toast({
