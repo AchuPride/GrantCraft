@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https,
+        protocol: 'https',
         hostname: 'eurydice.eacea.ec.europa.eu',
         port: '',
         pathname: '/**',
