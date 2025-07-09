@@ -12,6 +12,18 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+const getURL = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Vercel adds this
+    'http://localhost:9002/'; // dev fallback
+  // Make sure to include `https` in production
+  url = url.includes('http') ? url : `https://${url}`;
+  // Make sure to include a trailing `/`
+  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
+  return url;
+};
+
 export function SignupComponent() {
   const router = useRouter();
   const { toast } = useToast();
@@ -29,7 +41,7 @@ export function SignupComponent() {
       email,
       password,
       options: {
-        emailRedirectTo: `http://localhost:9002/auth/callback`,
+        emailRedirectTo: `${getURL()}auth/callback`,
         data: {
           full_name: fullName,
         },
@@ -60,7 +72,7 @@ export function SignupComponent() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `http://localhost:9002/auth/callback`,
+        redirectTo: `${getURL()}auth/callback`,
       },
     });
      if (error) {
